@@ -80,6 +80,7 @@ input, textarea {
     font-size: 0.95rem;
     transition: all 0.3s ease;
     background-color: #f9fcff;
+    resize: none;
 }
 
 input:focus, textarea:focus {
