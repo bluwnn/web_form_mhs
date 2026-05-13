@@ -1,93 +1,145 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial scale=1.0">
-    <title>Data Mahasiwa</title>
-
-    <!--ZALDY BUAT FILE style.css BARU BUAT STYLING-->
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Data Management</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   </head>
-
   <body>
-    <main class="container">
+    <div class="container">
+      <section class="card form-section">
+        <h2 class="section-title">Input Data Mahasiswa</h2>
+        <form id="studentForm">
+          <input type="hidden" id="editId" value="" />
 
-      <header class="header">
-        <h1>Form Data Mahasiswa</h1>
-        <p>Input dan kelola data mahasiswa</p>
-      </header>
-
-      <!--TEMPAT FORM-->
-      <section class="form-section">
-        <form id="formMahasiswa" class="form">
-
-          <div class="form-group">
-            <label for="nim">NIM</label>
-            <input type="text" id="nim" name="nim" placeholder="Masukkan NIM" required>
-          </div>
-
-          <div class="form-group">
-            <label for="nama">Nama Lengkap</label>
-            <input type="text" id="nama" name="nama" placeholder="Masukkan nama" required>
-          </div>
-
-          <div class="form-group">
-            <label for="alamat">Alamat</label>
-              <textarea id="alamat" name="alamat" rows="3" placeholder="Masukkan alamat"></textarea>
-          </div>
-
-          <div class="form-group">
-            <label>Jenis Kelamin</label>
-            <div class="radio-group">
-              <label><input type="radio" name="jk" value="Pria"> Pria</label>
-              <label><input type="radio" name="jk" value="Wanita"> Wanita</label>
-              <label><input type="radio" name="jk" value="Lainnya"> Lainnya</label>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="nama">Nama</label>
+              <input
+                type="text"
+                id="nama"
+                placeholder="Masukkan Nama"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="nim">NIM</label>
+              <input
+                type="text"
+                id="nim"
+                placeholder="Masukkan NIM"
+                required
+              />
+            </div>
+            <div class="form-group full-width">
+              <label for="alamat">Alamat</label>
+              <input
+                type="text"
+                id="alamat"
+                placeholder="Masukkan Alamatt"
+                required
+              ></input>
+            </div>
+            <div class="form-group">
+              <label for="tanggal_lahir">Tanggal Lahir</label>
+              <input type="date" id="tanggal_lahir" required />
+            </div>
+            <div class="form-group">
+              <label>Jenis Kelamin</label>
+              <div class="segmented-control">
+                <input
+                  type="radio"
+                  name="jenis_kelamin"
+                  id="jk_pria"
+                  value="Pria"
+                  checked
+                />
+                <label for="jk_pria">Pria</label>
+                <input
+                  type="radio"
+                  name="jenis_kelamin"
+                  id="jk_wanita"
+                  value="Wanita"
+                />
+                <label for="jk_wanita">Wanita</label>
+              </div>
+            </div>
+            <div class="form-group full-width">
+              <label for="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                placeholder="Masukkan Password"
+                required
+              />
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="ttl">Tanggal Lahir</label>
-            <input type="date" id="ttl" name="ttl">
-          </div>
-
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
-          </div>
-
           <div class="form-actions">
-            <button type="submit" id="btnSubmit">Submit</button>
-            <button type="reset">Reset</button>
+            <button type="button" id="btnReset" class="btn btn-outline">
+              Reset
+            </button>
+            <button type="submit" id="btnSubmit" class="btn btn-primary">
+              Submit
+            </button>
           </div>
-      
         </form>
       </section>
 
-      <!-- TABLE SECTION -->
-        <section class="table-section">
-          <h2>Daftar Mahasiswa</h2>
+      <section class="card data-section">
+        <div class="data-header">
+          <h2 class="section-title">Data Records</h2>
+          <div class="data-controls">
+            <button id="btnExport" class="btn btn-secondary">
+              <i class="fas fa-file-pdf"></i> Export PDF
+            </button>
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input
+                type="text"
+                id="searchInput"
+                placeholder="Cari Nama atau NIM..."
+              />
+            </div>
+          </div>
+        </div>
 
-          <table class="data-table">
+        <div class="table-responsive" id="tableContainer">
+          <table id="dataTable">
             <thead>
               <tr>
+                <th>No</th>
                 <th>NIM</th>
                 <th>Nama</th>
                 <th>Alamat</th>
-                <th>JK</th>
-                <th>TTL</th>
-                <th>Password</th>
+                <th>Tanggal Lahir</th>
+                <th>Jenis Kelamin</th>
                 <th>Aksi</th>
               </tr>
             </thead>
-            <tbody id="tableBody">
-                    <!-- JS nanti inject data di sini -->
-            </tbody>
+            <tbody id="tableBody"></tbody>
           </table>
-        </section>
+        </div>
 
-    </main>
-    <!--BUAT FILE script.js TIKA-->
-    <script src="script.js"> </script>
-    
+        <div class="pagination">
+          <button id="btnPrev" class="btn btn-icon" disabled>
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <span id="pageInfo">Page 1</span>
+          <button id="btnNext" class="btn btn-icon">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </section>
+    </div>
+    <script src="app.js"></script>
   </body>
 </html>
